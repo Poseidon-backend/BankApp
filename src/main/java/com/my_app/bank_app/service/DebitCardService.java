@@ -6,7 +6,7 @@ import java.util.List;
 
 public interface DebitCardService {
 
-    DebitCard createDebitCard(Long userId, DebitCard debitCard);
+    DebitCard createDebitCard(Long userId);
 
     DebitCard getDebitCardById(Long cardId);
 

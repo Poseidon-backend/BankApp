@@ -14,6 +14,8 @@ import java.util.List;
 @Service
 public class DebitCardServiceImpl implements DebitCardService {
 
+    private static int MAX_DEBIT_CARDS_PER_USER = 4;
+
     private final DebitCardRepository debitCardRepository;
     private final UserRepository userRepository;
     private final CardGeneratorService cardGeneratorService;
@@ -28,10 +30,16 @@ public class DebitCardServiceImpl implements DebitCardService {
 
     @Override
     @Transactional
-    public DebitCard createDebitCard(Long userId, DebitCard debitCard) {
+    public DebitCard createDebitCard(Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundByIdException(userId));
 
+        if (debitCardRepository.countDebitCardsByUserId(userId) >= MAX_DEBIT_CARDS_PER_USER) {
+            throw new MaxLimitDebitCardException(userId);
+        }
+
+        DebitCard debitCard = new DebitCard();
+        debitCard.setUser(user);
         debitCard.setCardNumber(cardGeneratorService.generateCardNumber());
 
         String cardholderFullName;
